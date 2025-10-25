@@ -1,45 +1,53 @@
 // src/RestaurantCard.jsx
 import React from 'react';
+import './RestaurantCard.css'; // 👈 1. CSS 파일 import
 
-function RestaurantCard({ restaurant }) {
-  const name = restaurant.name;
-  const menu = restaurant.menu || restaurant.category || '추천 메뉴';
+function RestaurantCard({ restaurant, userLocation }) {
+  const name = restaurant.name || '이름 없는 맛집';
+  const rawMenu = restaurant.menu || restaurant.category || '추천 메뉴';
+  const menu = rawMenu.replace('음식점 > ', '');
   const desc = restaurant.desc || restaurant.address || '맛집';
-  const imageUrl = restaurant.imageUrl || 'https://i.imgur.com/default-image.png';
+  const { placeUrl, lat, lng } = restaurant;
 
+  let directionsUrl = '';
+  if (userLocation && lat && lng) {
+    directionsUrl = `https://map.kakao.com/link/to/${name},${lat},${lng}/from/내 위치,${userLocation.lat},${userLocation.lng}`;
+  }
+  
   return (
-    <div
-      style={{
-        marginTop: '2rem',
-        /* width: '300px', */
-        width: '320px', /* 조금 더 넓게 */
-        borderRadius: '12px',
-        backgroundColor: '#fff',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        textAlign: 'center',
-        transition: 'all 0.3s ease',
-        overflow: 'hidden',
-      }}
-    >
-      <img
-        src={imageUrl}
-        alt={menu}
-        style={{
-          width: '100%',
-          /* height: '180px', */
-          height: '280px', /* 180px -> 280px로 수정 */
-          objectFit: 'cover',
-        }}
-      />
-      
-      <div style={{ padding: '1.5rem' }}>
-        <h2 style={{ margin: '0 0 0.5rem 0' }}>{name}</h2>
-        <p
-          style={{ fontSize: '1.2rem', margin: '0.5rem 0', color: '#ff6b6b' }}
-        >
-          🍜 {menu}
+    // 👇 2. style -> className으로 변경
+    <div className="cardContainer">
+      <div className="cardContent">
+        <h2 className="cardTitle">{name}</h2>
+        <p className="cardMenu">
+          🏷️ {menu}
         </p>
-        <p style={{ color: '#555', margin: 0 }}>{desc}</p>
+        <p className="cardDesc">
+          📍 {desc}
+        </p>
+        <div className="cardLinks">
+          <a
+            href={placeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cardLink"
+          >
+            상세보기
+          </a>
+          {directionsUrl && (
+            <>
+              <span className="cardLinkSeparator">|</span>
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cardLink directions"
+              >
+                길찾기
+              </a>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

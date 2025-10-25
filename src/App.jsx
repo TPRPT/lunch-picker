@@ -1,130 +1,190 @@
-import { useState } from 'react';
+// App.jsx
+import { useState, useCallback } from 'react';
 import RestaurantCard from './RestaurantCard.jsx';
+import MapDisplay from './MapDisplay.jsx';
+import './App.css'; // 👈 App.css 파일을 import 합니다.
+
+const categories = [
+  { value: '음식점', name: '전체' },
+  { value: '한식', name: '한식' },
+  { value: '중식', name: '중식' },
+  { value: '일식', name: '일식' },
+  { value: '양식', name: '양식' },
+  { value: '분식', name: '분식' },
+  { value: '카페', name: '카페' },
+];
 
 function App() {
-  // 1. imageUrl 속성 추가
-  const restaurants = [
-    {
-      name: '김밥천국',
-      menu: '돈까스정식',
-      desc: '든든한 한 끼 정식',
-      imageUrl: 'https://www.ghostfreshmart.com/wp-content/uploads/2020/08/%EB%8F%88%EA%B9%8C%EC%8A%A4.jpg',
-    },
-    {
-      name: '홍콩반점',
-      menu: '짜장면 + 탕수육',
-      desc: '가성비 중식 세트',
-      imageUrl: 'https://media.sodagift.com/img/image/1742369550207.jpg',
-    },
-    {
-      name: '봉추찜닭',
-      menu: '간장찜닭',
-      desc: '단짠의 조화',
-      imageUrl: 'https://mblogthumb-phinf.pstatic.net/MjAyNDA3MTJfMTg4/MDAxNzIwNzg2NjQyNjYy.h6j6rDXZVAzA8V9j1r8gVaOJ3M4NhIOxAYwWdpR6vPYg.QlVXS6NUX4EIaRlG2aRLbh8NAsa8zqniVRNQi6qfUCAg.JPEG/SE-25cefb2a-4044-11ef-8755-c3f7065e5427.jpg?type=w800',
-    },
-    {
-      name: '도스마스',
-      menu: '부리또',
-      desc: '가볍고 맛있는 멕시칸',
-      imageUrl: 'https://mblogthumb-phinf.pstatic.net/MjAyMzA0MDZfMzgg/MDAxNjgwNzM5Nzk5MzM5.TicCZB9imo_2fjLdph0Sz9rC1CvhFVgm9wU5VZOEAx0g.OzomloAezH2JBPiyYZhJpwTaaprrein_AIJRIIqIdvYg.JPEG.crispynote/717A9965.jpg?type=w800',
-    },
-    {
-      name: '이삭토스트',
-      menu: '햄치즈토스트',
-      desc: '간단한 브런치 스타일',
-      imageUrl: 'https://d3i25w97yl4le9.cloudfront.net/thumb/products/Joc7h3uhAdp8V7fwLEmOmbHEqWnCUKRTAzg8WwXB.png',
-    },
-    {
-      name: '엽기떡볶이',
-      menu: '국물떡볶이',
-      desc: '매운 게 땡길 때',
-      imageUrl: 'https://s3-ap-northeast-1.amazonaws.com/agreable-shoplink/item/templates/bc4e642e579445eabc05d05a2ba07097-w970-v2.jpg',
-    },
-    {
-      name: '교촌치킨',
-      menu: '허니콤보',
-      desc: '달콤짭짤 치킨 대표',
-      imageUrl: 'https://img1.kakaocdn.net/thumb/C320x320@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20230420141214_e6319192399544e5a7f5f1948be9e028.jpg',
-    },
-    {
-      name: '서브웨이',
-      menu: '이탈리안 비엠티',
-      desc: '커스텀 샌드위치',
-      imageUrl: 'https://menu.mt.co.kr/moneyweek/thumb/2022/07/06/06/2022070616210656364_1.jpg',
-    },
-    {
-      name: '쌀국수집',
-      menu: '소고기 쌀국수',
-      desc: '따뜻한 국물이 땡길 때',
-      imageUrl: 'https://recipe1.ezmember.co.kr/cache/recipe/2020/09/06/ee00d6e59def943bc0eb0354fb58a00d1.jpg',
-    },
-    {
-      name: '백반집',
-      menu: '제육볶음',
-      desc: '집밥이 그리울 때',
-      imageUrl: 'https://recipe1.ezmember.co.kr/cache/recipe/2015/05/27/38013d1dfd8fa46a871b9cda074b26341.jpg',
-    },
-  ];
-
+  // --- State 정의 ---
+  const [category, setCategory] = useState('음식점');
+  const [restaurants, setRestaurants] = useState([]);
   const [pick, setPick] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [lastSearchedCategory, setLastSearchedCategory] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
 
-  const pickRandom = () => {
-    const randomIndex = Math.floor(Math.random() * restaurants.length);
-    setPick(restaurants[randomIndex]);
+  // --- 카카오 지도 API 관련 변수 ---
+  const { kakao } = window;
+
+  // --- 함수 정의 ---
+  // (searchNearbyRestaurants, pickRandomRestaurant, handleSearchClick, handlePickRestaurant 함수는
+  //  파일에 있는 내용과 동일하므로 수정하지 않습니다.)
+  const searchNearbyRestaurants = useCallback(
+    (query, onSearchComplete) => {
+      if (!kakao || !kakao.maps || !kakao.maps.services) {
+        setError(
+          '카카오 지도 API가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.'
+        );
+        setIsLoading(false);
+        if (onSearchComplete) onSearchComplete(null);
+        return;
+      }
+      setIsLoading(true);
+      setError(null);
+      setPick(null);
+      setRestaurants([]);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const userLocation = new kakao.maps.LatLng(latitude, longitude);
+          setUserLocation({ lat: latitude, lng: longitude });
+          const places = new kakao.maps.services.Places();
+          const callback = (result, status) => {
+            setIsLoading(false);
+            if (status === kakao.maps.services.Status.OK) {
+              if (result.length === 0) {
+                setError(`주변 500m 내에 '${query}' 결과가 없습니다.`);
+                setRestaurants([]);
+                if (onSearchComplete) onSearchComplete(null);
+              } else {
+                const formattedRestaurants = result.map((place) => ({
+                  name: place.place_name,
+                  menu: place.category_name,
+                  desc: place.address_name,
+                  placeUrl: place.place_url,
+                  lat: place.y,
+                  lng: place.x,
+                }));
+                setRestaurants(formattedRestaurants);
+                setLastSearchedCategory(query);
+                if (onSearchComplete) onSearchComplete(formattedRestaurants);
+              }
+            } else {
+              setError('주변 식당을 찾는 데 실패했습니다.');
+              if (onSearchComplete) onSearchComplete(null);
+            }
+          };
+          places.keywordSearch(query, callback, {
+            location: userLocation,
+            radius: 500,
+            sort: kakao.maps.services.SortBy.DISTANCE,
+          });
+        },
+        (err) => {
+          setIsLoading(false);
+          setError(err, '위치 정보를 가져올 수 없습니다.');
+          if (onSearchComplete) onSearchComplete(null);
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+    },
+    [kakao]
+  );
+  const pickRandomRestaurant = () => {
+    if (restaurants.length === 0 || category !== lastSearchedCategory) {
+      setError(null);
+      setIsLoading(true);
+      const pickAfterSearch = (newList) => {
+        setIsLoading(false);
+        if (newList && newList.length > 0) {
+          const randomIndex = Math.floor(Math.random() * newList.length);
+          setPick(newList[randomIndex]);
+        }
+      };
+      searchNearbyRestaurants(category, pickAfterSearch);
+    } else {
+      const randomIndex = Math.floor(Math.random() * restaurants.length);
+      setPick(restaurants[randomIndex]);
+    }
   };
-
+  const handleSearchClick = () => {
+    searchNearbyRestaurants(category);
+  };
+  const handlePickRestaurant = (restaurant) => {
+    setPick(restaurant);
+  };
+  
   // --- UI (JSX) ---
-  // 이 부분은 수정할 필요 없습니다. (기존과 동일)
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>🍽️ 오늘 점심 뭐 먹지?</h1>
+    // 👇 style -> className으로 변경
+    <div className="container"> 
+      <h1 className="title">🍽️ 오늘 점심 뭐 먹지?</h1>
+
+      <p className="description">
+        지금 당장 배고픈 당신을 위해!
+        <br></br>
+        현재 위치 반경 500m 내의 식당을 검색합니다
+      </p>
+
+      <div className="searchBox">
+        <label htmlFor="category-select" className="hiddenLabel">
+          음식 카테고리
+        </label>
+        <select
+          id="category-select"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="select"
+        >
+          {categories.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+        <button onClick={handleSearchClick} className="button">
+          주변 식당 찾기
+        </button>
+      </div>
+
       <button
-        onClick={pickRandom}
-        style={{ ...styles.button, ...styles.randomButton }}
+        onClick={pickRandomRestaurant}
+        className="button randomButton" // 👈 클래스 2개 적용
       >
-        오늘의 메뉴 추천!
+        이 중에서 랜덤 추천!
       </button>
-      {pick && <RestaurantCard restaurant={pick} />}
+
+      {isLoading && <p className="message">찾는 중... 🔍</p>}
+      {/* 👇 에러 메시지만 인라인 스타일 유지 */}
+      {error && <p className="message" style={{ color: 'red' }}>{error}</p>}
+
+      {!pick && restaurants.length > 0 && category === lastSearchedCategory && (
+        <div className="listContainer">
+          <h3 className="listTitle">검색 결과 {restaurants.length}건</h3>
+          {restaurants.map((restaurant, index) => (
+            <div 
+              key={index} 
+              className="listItem"
+              onClick={() => handlePickRestaurant(restaurant)}
+            >
+              <h4 className="listItemH4">{restaurant.name}</h4>
+              <p className="listItemP">{restaurant.menu.replace('음식점 > ', '')}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {pick && (
+        <div className="resultsContainer">
+          <RestaurantCard restaurant={pick} userLocation={userLocation} />
+          <MapDisplay destination={pick} />
+        </div>
+      )}
     </div>
   );
 }
 
-// --- 스타일 객체 (기존과 동일) ---
-const styles = {
-  container: {
-    height: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fffbe6',
-    fontFamily: 'PretendM-ard, sans-serif',
-    padding: '1rem',
-    boxSizing: 'border-box',
-  },
-  title: {
-    margin: '0 0 1.5rem 0',
-    color: '#333',
-  },
-  button: {
-    padding: '10px 20px',
-    fontSize: '1rem',
-    borderRadius: '8px',
-    border: 'none',
-    backgroundColor: '#ffcc00',
-    color: '#333',
-    cursor: 'pointer',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-    transition: 'background-color 0.2s',
-  },
-  randomButton: {
-    marginTop: '1rem',
-    backgroundColor: '#ff6b6b',
-    color: 'white',
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
-    padding: '12px 24px',
-  },
-};
+// ❌ styles 객체 (208줄부터 283줄까지)는 모두 삭제합니다.
 
 export default App;

@@ -1,41 +1,145 @@
-#root {
-  margin: 0 auto;
-  padding: 0;
+/* src/App.css */
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fffbe6;
+  font-family: 'Pretendard', sans-serif;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.resultsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.listContainer {
+  width: 100%;
+  max-width: 664px;
+  margin-top: 2rem;
+  max-height: 350px;
+  overflow-y: auto;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+}
+
+.listTitle {
+  color: #555;
+  text-align: left;
+  margin: 0.5rem 0.5rem;
+  font-size: 1rem;
+}
+
+.listItem {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.listItem:hover {
+  background-color: #f9f9f9;
+}
+
+.listItemH4 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+}
+
+.listItemP {
+  margin: 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.title {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+  font-size: 2.5em; /* index.css에서 h1 스타일을 지웠으므로 추가 */
+  line-height: 1.1;
+}
+
+.description {
+  margin: 0 0 1.5rem 0;
+  color: #666;
+  font-size: 1rem;
+  max-width: 350px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.searchBox {
+  display: flex;
+  gap: 0.5rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.hiddenLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.select {
+  padding: 10px 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 150px;
+  background-color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  color: #333;
 }
 
-.card {
-  padding: 2em;
+.button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #ffcc00;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: background-color 0.2s;
+  font-family: inherit;
+  font-weight: 500;
 }
 
-.read-the-docs {
-  color: #888;
+.button:hover {
+  background-color: #f0c000;
+}
+
+.randomButton {
+  margin-top: 1rem;
+  background-color: #ff6b6b;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 12px 24px;
+}
+
+.randomButton:hover {
+  background-color: #ff5252;
+}
+
+.message {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  color: #555;
 }

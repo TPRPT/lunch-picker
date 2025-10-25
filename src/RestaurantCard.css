@@ -1,0 +1,55 @@
+/* src/RestaurantCard.css */
+.cardContainer {
+  width: 320px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cardContent {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.cardTitle {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.5em; /* h2 스타일 추가 */
+}
+
+.cardMenu {
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  color: #ff6b6b;
+}
+
+.cardDesc {
+  margin: 0;
+  color: #555;
+}
+
+.cardLinks {
+  margin-top: 0.5rem;
+}
+
+.cardLink {
+  text-decoration: none;
+  color: #555;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.cardLink.directions {
+  color: #555; /* RestaurantCard.jsx의 스타일을 따름 */
+}
+
+.cardLinkSeparator {
+  margin: 0 0.5rem;
+  color: #888;
+}
