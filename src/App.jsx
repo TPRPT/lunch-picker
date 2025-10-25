@@ -1,159 +1,96 @@
-// App.jsx
-import { useState, useCallback } from 'react';
-import RestaurantCard from './RestaurantCard.jsx'; // .jsx로 수정 (파일이름이 .jsx이므로)
+import { useState } from 'react';
+import RestaurantCard from './RestaurantCard.jsx';
 
 function App() {
-  // --- State 정의 ---
-  const [category, setCategory] = useState('음식점');
-  const [restaurants, setRestaurants] = useState([]);
-  const [pick, setPick] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // --- 네이버 지도 API 관련 변수 ---
-  const { naver } = window;
-
-  // --- 함수 정의 ---
-
-  /**
-   * 현재 위치 기반으로 주변 장소 검색 (useCallback으로 최적화)
-   * @param {string} query - 검색할 카테고리 (예: '음식점', '돈까스')
-   */
-  const searchNearbyRestaurants = useCallback(
-    (query) => {
-      // naver 객체가 로드되었는지 확인
-      if (!naver || !naver.maps || !naver.maps.services) {
-        setError(
-          '지도 API가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.'
-        );
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setError(null);
-      setPick(null);
-      setRestaurants([]);
-
-      // 1. Geolocation API로 현재 위치 가져오기
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const userLocation = new naver.maps.LatLng(latitude, longitude);
-
-          // 2. Places Service 초기화
-          const places = new naver.maps.services.Places();
-
-          // 3. 장소 검색
-          places.search(
-            {
-              query: query, // 인자로 받은 query 사용
-              location: userLocation,
-              radius: 500, // 500m 반경
-              sort: 'distance', // 거리순 정렬
-            },
-            (status, response) => {
-              setIsLoading(false);
-              if (status === naver.maps.services.Status.OK) {
-                if (response.result.list.length === 0) {
-                  setError(`주변 500m 내에 '${query}' 결과가 없습니다. 😅`);
-                  setRestaurants([]);
-                } else {
-                  console.log('검색 결과:', response.result.list);
-                  setRestaurants(response.result.list);
-                }
-              } else {
-                setError('주변 식당을 찾는 데 실패했습니다. 😥');
-              }
-            }
-          );
-        },
-        (err) => {
-          setIsLoading(false);
-          setError('위치 정보를 가져올 수 없습니다. 📍');
-          console.warn('ERROR(' + err.code + '): ' + err.message);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0,
-        }
-      );
+  // 1. imageUrl 속성 추가
+  const restaurants = [
+    {
+      name: '김밥천국',
+      menu: '돈까스정식',
+      desc: '든든한 한 끼 정식',
+      imageUrl: 'https://www.ghostfreshmart.com/wp-content/uploads/2020/08/%EB%8F%88%EA%B9%8C%EC%8A%A4.jpg',
     },
-    [naver] // naver 객체에만 의존
-  );
+    {
+      name: '홍콩반점',
+      menu: '짜장면 + 탕수육',
+      desc: '가성비 중식 세트',
+      imageUrl: 'https://media.sodagift.com/img/image/1742369550207.jpg',
+    },
+    {
+      name: '봉추찜닭',
+      menu: '간장찜닭',
+      desc: '단짠의 조화',
+      imageUrl: 'https://mblogthumb-phinf.pstatic.net/MjAyNDA3MTJfMTg4/MDAxNzIwNzg2NjQyNjYy.h6j6rDXZVAzA8V9j1r8gVaOJ3M4NhIOxAYwWdpR6vPYg.QlVXS6NUX4EIaRlG2aRLbh8NAsa8zqniVRNQi6qfUCAg.JPEG/SE-25cefb2a-4044-11ef-8755-c3f7065e5427.jpg?type=w800',
+    },
+    {
+      name: '도스마스',
+      menu: '부리또',
+      desc: '가볍고 맛있는 멕시칸',
+      imageUrl: 'https://mblogthumb-phinf.pstatic.net/MjAyMzA0MDZfMzgg/MDAxNjgwNzM5Nzk5MzM5.TicCZB9imo_2fjLdph0Sz9rC1CvhFVgm9wU5VZOEAx0g.OzomloAezH2JBPiyYZhJpwTaaprrein_AIJRIIqIdvYg.JPEG.crispynote/717A9965.jpg?type=w800',
+    },
+    {
+      name: '이삭토스트',
+      menu: '햄치즈토스트',
+      desc: '간단한 브런치 스타일',
+      imageUrl: 'https://d3i25w97yl4le9.cloudfront.net/thumb/products/Joc7h3uhAdp8V7fwLEmOmbHEqWnCUKRTAzg8WwXB.png',
+    },
+    {
+      name: '엽기떡볶이',
+      menu: '국물떡볶이',
+      desc: '매운 게 땡길 때',
+      imageUrl: 'https://s3-ap-northeast-1.amazonaws.com/agreable-shoplink/item/templates/bc4e642e579445eabc05d05a2ba07097-w970-v2.jpg',
+    },
+    {
+      name: '교촌치킨',
+      menu: '허니콤보',
+      desc: '달콤짭짤 치킨 대표',
+      imageUrl: 'https://img1.kakaocdn.net/thumb/C320x320@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20230420141214_e6319192399544e5a7f5f1948be9e028.jpg',
+    },
+    {
+      name: '서브웨이',
+      menu: '이탈리안 비엠티',
+      desc: '커스텀 샌드위치',
+      imageUrl: 'https://menu.mt.co.kr/moneyweek/thumb/2022/07/06/06/2022070616210656364_1.jpg',
+    },
+    {
+      name: '쌀국수집',
+      menu: '소고기 쌀국수',
+      desc: '따뜻한 국물이 땡길 때',
+      imageUrl: 'https://recipe1.ezmember.co.kr/cache/recipe/2020/09/06/ee00d6e59def943bc0eb0354fb58a00d1.jpg',
+    },
+    {
+      name: '백반집',
+      menu: '제육볶음',
+      desc: '집밥이 그리울 때',
+      imageUrl: 'https://recipe1.ezmember.co.kr/cache/recipe/2015/05/27/38013d1dfd8fa46a871b9cda074b26341.jpg',
+    },
+  ];
 
-  /** 식당 목록에서 랜덤으로 하나 선택 */
-  const pickRandomRestaurant = () => {
-    if (restaurants.length === 0) {
-      setError('먼저 주변 식당을 검색해 주세요!');
-      return;
-    }
+  const [pick, setPick] = useState(null);
+
+  const pickRandom = () => {
     const randomIndex = Math.floor(Math.random() * restaurants.length);
     setPick(restaurants[randomIndex]);
   };
 
-  /** 검색 버튼 클릭 핸들러 */
-  const handleSearchClick = () => {
-    searchNearbyRestaurants(category);
-  };
-
-  // ***** 🚀 useEffect 주석 처리! *****
-  // 페이지 로드 시 자동 검색은 스크립트 로딩과 충돌(Race Condition)을
-  // 일으킬 수 있으므로, 사용자 클릭으로 대체하는 것이 더 안정적입니다.
-  /*
-  useEffect(() => {
-    searchNearbyRestaurants('음식점');
-  }, [searchNearbyRestaurants]); 
-  */
-
   // --- UI (JSX) ---
+  // 이 부분은 수정할 필요 없습니다. (기존과 동일)
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>🍽️ 오늘 점심 뭐 먹지?</h1>
-
-      <div style={styles.searchBox}>
-        {/* 접근성 경고(Warning) 수정을 위해 label과 id, name 추가 */}
-        <label htmlFor="category-input" style={styles.hiddenLabel}>
-          음식 카테고리
-        </label>
-        <input
-          type="text"
-          id="category-input"
-          name="category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="예: 돈까스, 쌀국수, 백반"
-          style={styles.input}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearchClick()} // 엔터키로도 검색
-        />
-        <button onClick={handleSearchClick} style={styles.button}>
-          주변 식당 찾기
-        </button>
-      </div>
-
-      {restaurants.length > 0 && (
-        <button
-          onClick={pickRandomRestaurant}
-          style={{ ...styles.button, ...styles.randomButton }}
-        >
-          이 중에서 랜덤 추천!
-        </button>
-      )}
-
-      {/* 로딩 및 에러 메시지 표시 */}
-      {isLoading && <p style={styles.message}>찾는 중... 🔍</p>}
-      {error && <p style={{ ...styles.message, color: 'red' }}>{error}</p>}
-
-      {/* 추천 결과 표시 */}
+      <button
+        onClick={pickRandom}
+        style={{ ...styles.button, ...styles.randomButton }}
+      >
+        오늘의 메뉴 추천!
+      </button>
       {pick && <RestaurantCard restaurant={pick} />}
     </div>
   );
 }
 
-// --- 스타일 객체 ---
+// --- 스타일 객체 (기존과 동일) ---
 const styles = {
-  // (기존 styles 객체와 동일)
   container: {
     height: '100vh',
     display: 'flex',
@@ -168,28 +105,6 @@ const styles = {
   title: {
     margin: '0 0 1.5rem 0',
     color: '#333',
-  },
-  searchBox: {
-    display: 'flex',
-    gap: '0.5rem',
-  },
-  // 스크린 리더용 숨김 레이블
-  hiddenLabel: {
-    position: 'absolute',
-    width: '1px',
-    height: '1px',
-    padding: 0,
-    margin: '-1px',
-    overflow: 'hidden',
-    clip: 'rect(0, 0, 0, 0)',
-    border: 0,
-  },
-  input: {
-    padding: '10px 14px',
-    fontSize: '1rem',
-    borderRadius: '8px',
-    border: '1px solid #ccc',
-    width: '200px',
   },
   button: {
     padding: '10px 20px',
@@ -206,13 +121,9 @@ const styles = {
     marginTop: '1rem',
     backgroundColor: '#ff6b6b',
     color: 'white',
-    fontSize: '1.1rem',
+    fontSize: '1.2rem',
     fontWeight: 'bold',
-  },
-  message: {
-    marginTop: '1rem',
-    fontSize: '1.1rem',
-    color: '#555',
+    padding: '12px 24px',
   },
 };
 
