@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import RestaurantCard from './RestaurantCard.jsx';
 import MapDisplay from './MapDisplay.jsx';
-import './App.css'; // 👈 App.css 파일을 import 합니다.
+import './App.css';
 
 const categories = [
   { value: '음식점', name: '전체' },
@@ -28,8 +28,6 @@ function App() {
   const { kakao } = window;
 
   // --- 함수 정의 ---
-  // (searchNearbyRestaurants, pickRandomRestaurant, handleSearchClick, handlePickRestaurant 함수는
-  //  파일에 있는 내용과 동일하므로 수정하지 않습니다.)
   const searchNearbyRestaurants = useCallback(
     (query, onSearchComplete) => {
       if (!kakao || !kakao.maps || !kakao.maps.services) {
@@ -117,7 +115,6 @@ function App() {
   
   // --- UI (JSX) ---
   return (
-    // 👇 style -> className으로 변경
     <div className="container"> 
       <h1 className="title">🍽️ 오늘 점심 뭐 먹지?</h1>
 
@@ -150,13 +147,12 @@ function App() {
 
       <button
         onClick={pickRandomRestaurant}
-        className="button randomButton" // 👈 클래스 2개 적용
+        className="button randomButton"
       >
         이 중에서 랜덤 추천!
       </button>
 
       {isLoading && <p className="message">찾는 중... 🔍</p>}
-      {/* 👇 에러 메시지만 인라인 스타일 유지 */}
       {error && <p className="message" style={{ color: 'red' }}>{error}</p>}
 
       {!pick && restaurants.length > 0 && category === lastSearchedCategory && (
@@ -184,7 +180,5 @@ function App() {
     </div>
   );
 }
-
-// ❌ styles 객체 (208줄부터 283줄까지)는 모두 삭제합니다.
 
 export default App;

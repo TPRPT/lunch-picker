@@ -67,7 +67,7 @@
 .title {
   margin: 0 0 1.5rem 0;
   color: #333;
-  font-size: 2.5em; /* index.css에서 h1 스타일을 지웠으므로 추가 */
+  font-size: 2.5em;
   line-height: 1.1;
 }
 

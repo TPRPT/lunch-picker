@@ -20,7 +20,7 @@
 .cardTitle {
   margin: 0 0 0.5rem 0;
   color: #333;
-  font-size: 1.5em; /* h2 스타일 추가 */
+  font-size: 1.5em;
 }
 
 .cardMenu {
@@ -46,7 +46,7 @@
 }
 
 .cardLink.directions {
-  color: #555; /* RestaurantCard.jsx의 스타일을 따름 */
+  color: #555;
 }
 
 .cardLinkSeparator {

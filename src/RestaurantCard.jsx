@@ -1,6 +1,6 @@
 // src/RestaurantCard.jsx
 import React from 'react';
-import './RestaurantCard.css'; // 👈 1. CSS 파일 import
+import './RestaurantCard.css';
 
 function RestaurantCard({ restaurant, userLocation }) {
   const name = restaurant.name || '이름 없는 맛집';
@@ -15,7 +15,6 @@ function RestaurantCard({ restaurant, userLocation }) {
   }
   
   return (
-    // 👇 2. style -> className으로 변경
     <div className="cardContainer">
       <div className="cardContent">
         <h2 className="cardTitle">{name}</h2>
