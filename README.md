@@ -1,6 +1,7 @@
 # 🍽️ 오늘 점심 뭐 먹지? (Lunch Picker)
 
-React 연습용으로 간단히 만든 점심 메뉴 및 식당 추천 웹 애프리케이션입니다.
+React 연습용으로 간단히 만든 점심 메뉴 및 식당 추천 웹 애플리케이션입니다.
+
 Kakao Maps API를 사용하여 현재 위치 기반으로 주변 식당을 추천하고 위치를 확인할 수 있습니다.
 
 배포 URL: https://lunch-picker-ten.vercel.app/
